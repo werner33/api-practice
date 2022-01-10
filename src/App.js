@@ -1,25 +1,61 @@
-import logo from './logo.svg';
+import React, {Suspense, useState, useEffect} from 'react';
+
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link
+} from "react-router-dom";
+
+// import Staff from './Staff';
+import StudentCollection from './StudentCollection';
+// import Staff from './Staff';
+
 import './App.css';
 
+const Staff = React.lazy(() => import('./Staff'));
+
+
 function App() {
+
+  const [students, setStudents] = useState([]);
+
+  useEffect(() => {
+      fetch('https://codewars-tracker-be.herokuapp.com/users/fellows')
+      .then( res => res.json())
+      .then(data => {
+          setStudents(data)
+      })
+  }, []);
+
+
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="App">
+      <nav>
+          <ul>
+            <li>
+              <Link to="/">Students</Link>
+            </li>
+            <li>
+              <Link to="/Staff">Staff</Link>
+            </li>
+          </ul>
+        </nav>
+        <Routes>
+          <Route path="/" element={<StudentCollection students={students}/>} /> 
+          <Route path="/staff" element={
+            <Suspense fallback={<div>Loading...</div>}>
+               <Staff />
+            </Suspense>
+          } />
+        </Routes>
+      </div>
+    </Router>
   );
 }
+
 
 export default App;
